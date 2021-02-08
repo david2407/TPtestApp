@@ -1,14 +1,18 @@
-import React, { Component, useState } from "react";
-import { Card, Button, Form } from "react-bootstrap";
+import React, { useState } from "react";
+import { Alert, Card, Button, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
+import AlertSuccess from "./AlertSuccess";
 
 export default function UserForm({ companyData }) {
   const { register, handleSubmit } = useForm({ defaultValues: companyData });
+
+  const [showError, setShowError] = useState(false);
   const [error, setError] = useState("");
 
-  const onSubmit = (data) => {
-    // console.log(data);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
+  const onSubmit = (data) => {
     const url = `http://localhost:3000/companies/${data.id}`;
 
     fetch(url, {
@@ -17,65 +21,44 @@ export default function UserForm({ companyData }) {
       headers: { "Content-Type": "application/json" },
     })
       .then((res) => res.json())
-      .catch((error) => setError(error))
-      .then((response) => console.log(response));
-  };
-
-  const initialFormData = {
-    address: "13213",
-    cellphoneMessages: "on",
-    city: "Medellin",
-    email: "davidcortes2407@gmail.com",
-    emailMessages: "on",
-    firstName1: "David",
-    firstName2: "",
-    idNumber: "1",
-    name: "Company",
-    secondName1: "Cortes",
-    secondName2: "",
-    typeIdSelect: "Persona Natural",
-  };
-
-  const [formData, updateFormData] = useState(initialFormData);
-
-  // data
-  const [name, setName] = useState(companyData.name);
-  const [idNumber, setIdNumber] = useState(0);
-  const [typeIdSelect, setTypeIdSelect] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [email, setEmail] = useState("");
-  const [firstName1, setFirstName] = useState("");
-  const [firstName2, setFirstName2] = useState("");
-  const [secondName1, setSecondName1] = useState("");
-  const [secondName2, setSecondName2] = useState("");
-  const [emailMessages, setEmailMessages] = useState(false);
-  const [cellphoneMessages, setCellphoneMessages] = useState(false);
-
-  const handleChange = (event) => {
-    {
-      this.myValue = event.target.value;
-    }
-  };
-
-  const onFormSubmit = (e) => {
-    e.preventDefault();
-    const formDataR = new FormData(e.target),
-      formDataObj = Object.fromEntries(formDataR.entries());
-    updateFormData(formDataObj);
-    console.log(companyData);
+      .catch((error) => {
+        setError(error.message);
+        setShowError(true);
+      })
+      .then((response) => {
+        setSuccessMessage("Se actualizo la empresa correctamente");
+        setShowSuccess(true);
+      });
   };
 
   return (
     <div className="Form col-md-8 col-lg-6">
       <div className="card shadow">
-        <div className="card-header">
-          <h4 className="text-center">Company Validation</h4>
-        </div>
-
         <Card>
           <Card.Body>
             <Form onSubmit={handleSubmit(onSubmit)}>
+              {showError && (
+                <Alert
+                  variant="danger"
+                  onClose={() => setShowError(false)}
+                  dismissible
+                >
+                  <Alert.Heading>Error!</Alert.Heading>
+                  <p>{error}</p>
+                </Alert>
+              )}
+
+              {showSuccess && (
+                <Alert
+                  variant="success"
+                  onClose={() => setShowSuccess(false)}
+                  dismissible
+                >
+                  <Alert.Heading>Exitoso!</Alert.Heading>
+                  <p>{successMessage}</p>
+                </Alert>
+              )}
+
               <Form.Group controlId="exampleForm.ControlSelect1">
                 <Form.Label>Identification Type</Form.Label>
                 <Form.Control required as="select" name="IdType" ref={register}>
