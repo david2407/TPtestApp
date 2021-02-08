@@ -1,5 +1,5 @@
-import React, { Component, useState, useEffect } from "react";
-import { Toast, Card, Button, Form } from "react-bootstrap";
+import React, { useState } from "react";
+import { Alert, Card, Button, Form } from "react-bootstrap";
 import UserForm from "./Form";
 
 function InitialForm(data) {
@@ -8,20 +8,25 @@ function InitialForm(data) {
 
   const [ableUpdate, setAbleUpdate] = useState(false);
 
-  const [showA, setShowA] = useState(false);
-
-  const toggleShowA = () => setShowA(!showA);
+  const [showError, setShowError] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const comp = data.data.find((item) => item.id == CompanyId);
 
-    if (comp.ableRegister == true) {
-      setAbleUpdate(true);
+    if (comp !== undefined) {
+      if (comp.errorCode > 0) {
+        setMessageError(
+          comp.errorMessage !== undefined ? comp.errorMessage : ""
+        );
+        setShowError(true);
+      } else {
+        setAbleUpdate(true);
+      }
     } else {
-      setMessageError(comp.message);
-      setShowA(!showA);
+      setMessageError("La empresa no se encuentra en la base de datos");
+      setShowError(true);
     }
   };
 
@@ -47,16 +52,16 @@ function InitialForm(data) {
             </Form>
           </Card.Body>
 
-          <Toast show={showA} autohide onClose={toggleShowA}>
-            <Toast.Header>
-              <strong className="mr-auto">Error</strong>
-            </Toast.Header>
-            <Toast.Body>
-              {messageError.length === 0
-                ? "La empresa no esta registrada en la base de datos"
-                : messageError}
-            </Toast.Body>
-          </Toast>
+          {showError && (
+            <Alert
+              variant="danger"
+              onClose={() => setShowError(false)}
+              dismissible
+            >
+              <Alert.Heading>Error!</Alert.Heading>
+              <p>{messageError}</p>
+            </Alert>
+          )}
         </Card>
       )}
 

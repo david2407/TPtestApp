@@ -1,6 +1,5 @@
-import logo from "./logo.svg";
 import "./App.css";
-import Formu from "./Form";
+
 import InitialForm from "./InitialForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
